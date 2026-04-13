@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: app-pr-previews
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - pullRequest:
+        github:
+          owner: REPLACE_WITH_ORG
+          repo: REPLACE_WITH_REPO
+          tokenRef:
+            secretName: github-token
+            key: token
+        requeueAfterSeconds: 60
+  template:
+    metadata:
+      name: 'app-pr-{{ .number }}'
+      labels:
+        preview: "true"
+        pr: '{{ .number }}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/REPLACE_WITH_ORG/REPLACE_WITH_REPO
+        targetRevision: '{{ .head_sha }}'
+        path: charts/app
+        helm:
+          releaseName: 'pr-{{ .number }}'
+          valueFiles:
+            - values.yaml
+            - environments/values-sandbox.yaml
+          parameters:
+            - name: global.releaseName
+              value: 'pr-{{ .number }}'
+            - name: components.frontend.image.tag
+              value: '{{ .head_sha }}'
+            - name: components.backend.image.tag
+              value: '{{ .head_sha }}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'app-pr-{{ .number }}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

@@ -1,0 +1,53 @@
+global:
+  releaseName: ""
+  namespace: ""
+  imageRegistry: ""
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
+  ingress:
+    enabled: true
+    className: nginx
+    scheme: https
+    hostSuffix: sandbox.example.com
+    tls:
+      enabled: false
+      secretName: ""
+
+components:
+  frontend:
+    image:
+      repository: app-frontend
+      tag: latest
+    replicas: 1
+    port: 80
+    containerPort: 8080
+    exposed: true
+    hostPrefix: ""
+    env:
+      - name: BACKEND_URL
+        value: "{{ .Values.global.ingress.scheme }}://api-{{ .Values.global.releaseName }}.{{ .Values.global.ingress.hostSuffix }}"
+    resources:
+      requests: { cpu: 50m, memory: 64Mi }
+      limits:   { cpu: 200m, memory: 128Mi }
+    probes:
+      liveness:  { path: /, port: 8080 }
+      readiness: { path: /, port: 8080 }
+
+  backend:
+    image:
+      repository: app-backend
+      tag: latest
+    replicas: 1
+    port: 80
+    containerPort: 3000
+    exposed: true
+    hostPrefix: "api-"
+    env:
+      - name: NODE_ENV
+        value: production
+    resources:
+      requests: { cpu: 50m, memory: 64Mi }
+      limits:   { cpu: 200m, memory: 128Mi }
+    probes:
+      liveness:  { path: /api/health, port: 3000 }
+      readiness: { path: /api/health, port: 3000 }

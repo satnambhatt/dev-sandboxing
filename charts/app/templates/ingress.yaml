@@ -1,0 +1,32 @@
+{{- if .Values.global.ingress.enabled }}
+{{- range $name, $cfg := .Values.components }}
+{{- if $cfg.exposed }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "app.componentName" (dict "root" $ "name" $name) }}
+  namespace: {{ include "app.namespace" $ }}
+  labels: {{- include "app.labels" (dict "root" $ "name" $name) | nindent 4 }}
+spec:
+  ingressClassName: {{ $.Values.global.ingress.className }}
+  {{- if $.Values.global.ingress.tls.enabled }}
+  tls:
+    - hosts:
+        - {{ include "app.host" (dict "root" $ "cfg" $cfg) }}
+      secretName: {{ $.Values.global.ingress.tls.secretName }}
+  {{- end }}
+  rules:
+    - host: {{ include "app.host" (dict "root" $ "cfg" $cfg) }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "app.componentName" (dict "root" $ "name" $name) }}
+                port:
+                  number: {{ $cfg.port }}
+{{- end }}
+{{- end }}
+{{- end }}

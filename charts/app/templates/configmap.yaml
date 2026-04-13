@@ -1,0 +1,16 @@
+{{- range $name, $cfg := .Values.components }}
+{{- if $cfg.configData }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "app.componentName" (dict "root" $ "name" $name) }}
+  namespace: {{ include "app.namespace" $ }}
+  labels: {{- include "app.labels" (dict "root" $ "name" $name) | nindent 4 }}
+data:
+{{- range $k, $v := $cfg.configData }}
+  {{ $k }}: |
+{{ $v | indent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}
