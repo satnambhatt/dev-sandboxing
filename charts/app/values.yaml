@@ -3,6 +3,7 @@ global:
   namespace: ""
   imageRegistry: ""
   imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
   ingress:
     enabled: true
     className: nginx

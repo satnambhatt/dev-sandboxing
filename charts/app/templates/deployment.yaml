@@ -14,6 +14,10 @@ spec:
     metadata:
       labels: {{- include "app.selectorLabels" (dict "root" $ "name" $name) | nindent 8 }}
     spec:
+      {{- with $.Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ $name }}
           image: "{{ include "app.image" (dict "root" $ "cfg" $cfg) }}"
