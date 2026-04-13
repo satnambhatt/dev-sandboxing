@@ -1,0 +1,17 @@
+{{- range $name, $cfg := .Values.components }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "app.componentName" (dict "root" $ "name" $name) }}
+  namespace: {{ include "app.namespace" $ }}
+  labels: {{- include "app.labels" (dict "root" $ "name" $name) | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector: {{- include "app.selectorLabels" (dict "root" $ "name" $name) | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ $cfg.port }}
+      targetPort: {{ $cfg.containerPort }}
+      protocol: TCP
+{{- end }}
