@@ -1,0 +1,12 @@
+global:
+  imageRegistry: REPLACE_WITH_REGISTRY
+  imagePullPolicy: IfNotPresent
+  ingress:
+    scheme: https
+    hostSuffix: staging.example.com
+    tls:
+      enabled: true
+      secretName: wildcard-staging-tls
+components:
+  frontend: { replicas: 2 }
+  backend:  { replicas: 2 }

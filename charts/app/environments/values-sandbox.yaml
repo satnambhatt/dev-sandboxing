@@ -1,0 +1,12 @@
+global:
+  imageRegistry: REPLACE_WITH_REGISTRY
+  imagePullPolicy: IfNotPresent
+  ingress:
+    scheme: https
+    hostSuffix: sandbox.example.com
+    tls:
+      enabled: true
+      secretName: wildcard-sandbox-tls
+components:
+  frontend: { replicas: 1 }
+  backend:  { replicas: 1 }

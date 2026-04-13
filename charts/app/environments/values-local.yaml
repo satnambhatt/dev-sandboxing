@@ -1,0 +1,10 @@
+global:
+  imageRegistry: ""
+  imagePullPolicy: Never
+  ingress:
+    enabled: true
+    className: nginx
+    scheme: http
+    hostSuffix: sandbox.local
+    tls:
+      enabled: false
