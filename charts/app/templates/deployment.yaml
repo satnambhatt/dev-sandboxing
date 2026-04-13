@@ -1,0 +1,41 @@
+{{- range $name, $cfg := .Values.components }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "app.componentName" (dict "root" $ "name" $name) }}
+  namespace: {{ include "app.namespace" $ }}
+  labels: {{- include "app.labels" (dict "root" $ "name" $name) | nindent 4 }}
+spec:
+  replicas: {{ $cfg.replicas }}
+  selector:
+    matchLabels: {{- include "app.selectorLabels" (dict "root" $ "name" $name) | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "app.selectorLabels" (dict "root" $ "name" $name) | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ $name }}
+          image: "{{ include "app.image" (dict "root" $ "cfg" $cfg) }}"
+          imagePullPolicy: {{ $.Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: {{ $cfg.containerPort }}
+          env:
+            {{- range $cfg.env }}
+            - name: {{ .name }}
+              value: {{ tpl .value $ | quote }}
+            {{- end }}
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: RELEASE_NAME
+              value: {{ include "app.release" $ | quote }}
+            - name: VERSION
+              value: {{ $cfg.image.tag | quote }}
+          livenessProbe:
+            {{- include "app.probe" $cfg.probes.liveness | nindent 12 }}
+          readinessProbe:
+            {{- include "app.probe" $cfg.probes.readiness | nindent 12 }}
+          resources: {{- toYaml $cfg.resources | nindent 12 }}
+{{- end }}
