@@ -33,9 +33,15 @@ spec:
               value: {{ include "app.release" $ | quote }}
             - name: VERSION
               value: {{ $cfg.image.tag | quote }}
+          {{- with $cfg.probes }}
+          {{- with .liveness }}
           livenessProbe:
-            {{- include "app.probe" $cfg.probes.liveness | nindent 12 }}
+            {{- include "app.probe" . | nindent 12 }}
+          {{- end }}
+          {{- with .readiness }}
           readinessProbe:
-            {{- include "app.probe" $cfg.probes.readiness | nindent 12 }}
+            {{- include "app.probe" . | nindent 12 }}
+          {{- end }}
+          {{- end }}
           resources: {{- toYaml $cfg.resources | nindent 12 }}
 {{- end }}
