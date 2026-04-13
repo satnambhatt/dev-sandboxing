@@ -127,6 +127,7 @@ global:
   ingress:
     enabled: true
     className: nginx
+    scheme: https              # "http" for local, "https" for cloud envs
     hostSuffix: sandbox.example.com
     tls:
       enabled: false
@@ -142,7 +143,7 @@ components:
     hostPrefix: ""             # "" → {releaseName}.{hostSuffix}
     env:
       - name: BACKEND_URL
-        value: "https://api-{{ .Values.global.releaseName }}.{{ .Values.global.ingress.hostSuffix }}"
+        value: "{{ .Values.global.ingress.scheme }}://api-{{ .Values.global.releaseName }}.{{ .Values.global.ingress.hostSuffix }}"
     resources:
       requests: { cpu: 50m,  memory: 64Mi }
       limits:   { cpu: 200m, memory: 128Mi }
@@ -177,6 +178,7 @@ global:
   imagePullPolicy: Never       # force use of locally-built image
   ingress:
     className: nginx
+    scheme: http
     hostSuffix: sandbox.local
 ```
 
