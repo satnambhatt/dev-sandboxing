@@ -2,6 +2,13 @@
 
 One Helm chart, every environment. Spin up a full-stack sandbox with one command locally, or automatically per PR in a cloud cluster via ArgoCD.
 
+**Docs:**
+- [Article / narrative walkthrough](docs/article.md)
+- [Architecture overview](docs/ARCHITECTURE.md)
+- [Chart values reference](docs/CHART_REFERENCE.md)
+- [ArgoCD setup guide](docs/ARGOCD_SETUP.md)
+- [Contributing](CONTRIBUTING.md)
+
 ## Layout
 
 - `apps/frontend` — React + Vite
