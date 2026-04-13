@@ -1,0 +1,9 @@
+{{- if not .Values.global.namespace }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ include "app.namespace" . }}
+  labels:
+    app.kubernetes.io/instance: {{ include "app.release" . }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
